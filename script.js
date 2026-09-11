@@ -66,24 +66,52 @@ document.addEventListener('DOMContentLoaded',()=>{
     img.src=src;
   });
 
-  const counters=document.querySelectorAll('[data-count]');
-  const counterObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
-    if(!entry.isIntersecting)return;
-    const el=entry.target;
-    const target=Number(el.dataset.count||0);
+  const statsSection=document.getElementById('heroStats');
+  let statsAnimated=false;
+
+  function animateCounter(el){
+    const target=parseInt(el.dataset.count,10)||0;
     const suffix=el.dataset.suffix||'';
-    const start=performance.now();
-    const duration=900;
-    const tick=now=>{
-      const p=Math.min((now-start)/duration,1);
-      const eased=1-Math.pow(1-p,3);
-      el.textContent=Math.round(target*eased)+suffix;
-      if(p<1)requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-    counterObserver.unobserve(el);
-  }),{threshold:.65});
-  counters.forEach(el=>counterObserver.observe(el));
+    const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reducedMotion){el.textContent=target+suffix;return}
+
+    const duration=1000;
+    const startTime=performance.now();
+    el.textContent='0'+suffix;
+
+    function frame(now){
+      const progress=Math.min((now-startTime)/duration,1);
+      const eased=1-Math.pow(1-progress,3);
+      const value=Math.round(target*eased);
+      el.textContent=value+suffix;
+      if(progress<1)requestAnimationFrame(frame);
+      else el.textContent=target+suffix;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function runStatsCounters(){
+    if(statsAnimated||!statsSection)return;
+    statsAnimated=true;
+    statsSection.querySelectorAll('[data-count]').forEach(animateCounter);
+  }
+
+  if(statsSection){
+    const statsObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          runStatsCounters();
+          statsObserver.disconnect();
+        }
+      });
+    },{threshold:.2,rootMargin:'0px 0px -5% 0px'});
+    statsObserver.observe(statsSection);
+
+    requestAnimationFrame(()=>{
+      const r=statsSection.getBoundingClientRect();
+      if(r.top<innerHeight&&r.bottom>0)runStatsCounters();
+    });
+  }
 
   document.querySelectorAll('a[href]').forEach(link=>{
     const href=link.getAttribute('href');
