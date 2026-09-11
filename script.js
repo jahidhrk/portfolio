@@ -1,20 +1,101 @@
-const reveals=document.querySelectorAll('.reveal');const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.1});reveals.forEach(el=>io.observe(el));const glow=document.querySelector('.cursor-dot');window.addEventListener('pointermove',e=>{if(glow){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px'}});document.querySelectorAll('.discipline').forEach(card=>{card.addEventListener('pointermove',e=>{if(innerWidth<900)return;const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;card.style.transform=`perspective(1100px) rotateX(${-y*2.2}deg) rotateY(${x*2.2}deg) translateY(-7px)`});card.addEventListener('pointerleave',()=>card.style.transform='')});window.addEventListener('scroll',()=>{const portrait=document.querySelector('.portrait-frame');if(portrait&&innerWidth>900){const y=Math.min(scrollY*.035,25);portrait.style.transform=`translateY(${y}px)`}});const profile=document.getElementById('profilePhoto');if(profile){const custom=new Image();custom.onload=()=>{profile.src='assets/profile.jpg'};custom.src='assets/profile.jpg'}document.querySelectorAll('.gallery-placeholder').forEach((box,i)=>{const src=`assets/training-${String(i+1).padStart(2,'0')}.jpg`;const img=new Image();img.onload=()=>{img.alt='Jahid Hassan Rakib training and career moment';Object.assign(img.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:'0'});box.prepend(img);box.querySelectorAll('span,b').forEach(x=>x.style.textShadow='0 2px 20px rgba(0,0,0,.55)')};img.src=src});
-function addProjectPreview(category,removeSelector,alts){const card=document.querySelector(`a[href="work.html?category=${category}"]`);if(!card)return;const old=card.querySelector(removeSelector);if(!old)return;const wrap=document.createElement('div');Object.assign(wrap.style,{height:'225px',display:'grid',gridTemplateColumns:'1.45fr .85fr',gridTemplateRows:'1fr 1fr',gap:'8px',marginTop:'8px',overflow:'hidden',borderRadius:'18px'});for(let i=1;i<=3;i++){const img=document.createElement('img');img.src=`assets/projects/${category}-0${i}.png`;img.alt=alts[i-1];Object.assign(img.style,{width:'100%',height:'100%',objectFit:'cover',display:'block'});if(i===1)img.style.gridRow='1 / span 2';wrap.appendChild(img)}old.replaceWith(wrap)}
-addProjectPreview('design','.type-art',['Campaign and brand communication project','Social media creative and content design project','Corporate and business communication project']);addProjectPreview('tech','.tech-art',['Digital order system project','AI business project','Computer vision and robotics project']);addProjectPreview('apparel','.shirt-art',['T-shirt design project','Hoodie and merchandise project','Custom freelance apparel project']);addProjectPreview('presentation','.deck-art',['Management dashboard project','Business proposal deck project','Executive report design project']);
+document.addEventListener('DOMContentLoaded',()=>{
+  requestAnimationFrame(()=>document.body.classList.add('page-ready'));
 
-(function addNowBuilding(){
-const nav=document.querySelector('.navlinks');
-if(nav&&!nav.querySelector('a[href="#now-building"]')){const workLink=nav.querySelector('a[href="#work"]');const link=document.createElement('a');link.href='#now-building';link.textContent='Now Building';if(workLink)workLink.insertAdjacentElement('afterend',link);else nav.prepend(link)}
-const work=document.getElementById('work');if(!work||document.getElementById('now-building'))return;
-const style=document.createElement('style');style.id='now-building-styles';style.textContent=`
-.now-building-section{padding-top:105px;padding-bottom:105px}.now-building-head{display:grid;grid-template-columns:1.15fr .85fr;gap:8vw;align-items:end;margin-bottom:42px}.now-building-head h2{font-size:clamp(42px,5vw,72px);line-height:1.02;letter-spacing:-.052em;margin:14px 0 0}.now-building-head p{color:var(--muted);font-size:16px;line-height:1.7;max-width:520px}.now-building-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.now-project{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px rgba(16,33,58,.06);transition:.3s}.now-project:hover{transform:translateY(-6px);box-shadow:var(--shadow)}.now-project-image{height:245px;background:#edf2f8;overflow:hidden}.now-project-image img{width:100%;height:100%;object-fit:cover;display:block}.now-project-body{padding:22px}.now-project-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.now-project-meta span:first-child{font-size:10px;letter-spacing:.13em;font-weight:800;color:#667085}.now-status{font-size:10px;font-weight:800;padding:7px 10px;border-radius:999px;background:#eef3ff;color:#2857e5}.now-project h3{font-size:24px;letter-spacing:-.035em;margin:0 0 10px}.now-project p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.now-project a{display:inline-block;margin-top:18px;font-size:12px;font-weight:700;color:var(--blue)}@media(max-width:900px){.now-building-head{grid-template-columns:1fr;gap:18px}.now-building-grid{grid-template-columns:1fr}.now-project-image{height:auto;aspect-ratio:16/10}}
-`;document.head.appendChild(style);
-const section=document.createElement('section');section.id='now-building';section.className='section section-shell now-building-section';section.innerHTML=`
-<div class="now-building-head"><div><span class="overline">NOW — BUILDING</span><h2>Ideas I’m actively<br>turning into systems.</h2></div><p>A live view of the AI, automation and technology concepts I’m currently exploring and developing alongside my core business work.</p></div>
-<div class="now-building-grid">
-<article class="now-project"><div class="now-project-image"><img src="assets/projects/tech-03.png" alt="AI assistant robot and robotics project"></div><div class="now-project-body"><div class="now-project-meta"><span>AI + ROBOTICS</span><span class="now-status">IN DEVELOPMENT</span></div><h3>AI Assistant Robot</h3><p>Exploring a practical assistant that combines conversational AI, automation and physical interaction into one usable system.</p><a href="work.html?category=tech">View related technology work ↗</a></div></article>
-<article class="now-project"><div class="now-project-image"><img src="assets/projects/tech-02.png" alt="Business AI and automation project"></div><div class="now-project-body"><div class="now-project-meta"><span>BUSINESS AI</span><span class="now-status">EXPLORING</span></div><h3>Business AI & Automation</h3><p>Testing AI-assisted workflows that can simplify repetitive business tasks, improve information flow and support faster decisions.</p><a href="work.html?category=tech">View related technology work ↗</a></div></article>
-<article class="now-project"><div class="now-project-image"><img src="assets/projects/tech-01.png" alt="Digital system and workflow project"></div><div class="now-project-body"><div class="now-project-meta"><span>DIGITAL SYSTEMS</span><span class="now-status">BUILDING</span></div><h3>Smart Workflow Tools</h3><p>Developing lightweight digital systems and interfaces that connect business processes, users and actionable data more clearly.</p><a href="work.html?category=tech">View related technology work ↗</a></div></article>
-</div>`;
-work.insertAdjacentElement('afterend',section);
-})();
+  const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(entry.isIntersecting){entry.target.classList.add('show');revealObserver.unobserve(entry.target)}
+  }),{threshold:.1,rootMargin:'0px 0px -5% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+
+  const cursor=document.querySelector('.cursor-dot');
+  if(cursor){
+    window.addEventListener('pointermove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+    document.querySelectorAll('a,button,.discipline,.now-card,.testimonial-card,.gallery-card').forEach(el=>{
+      el.addEventListener('pointerenter',()=>document.body.classList.add('link-hover'));
+      el.addEventListener('pointerleave',()=>document.body.classList.remove('link-hover'));
+    });
+  }
+
+  document.querySelectorAll('.discipline').forEach(card=>{
+    card.addEventListener('pointermove',e=>{
+      if(innerWidth<900)return;
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      card.style.transform=`perspective(1100px) rotateX(${-y*2.1}deg) rotateY(${x*2.1}deg) translateY(-7px)`;
+    });
+    card.addEventListener('pointerleave',()=>card.style.transform='');
+  });
+
+  document.querySelectorAll('.magnetic').forEach(el=>{
+    el.addEventListener('pointermove',e=>{
+      if(innerWidth<900)return;
+      const r=el.getBoundingClientRect();
+      const x=(e.clientX-r.left-r.width/2)*.12;
+      const y=(e.clientY-r.top-r.height/2)*.16;
+      el.style.transform=`translate(${x}px,${y}px)`;
+    });
+    el.addEventListener('pointerleave',()=>el.style.transform='');
+  });
+
+  function updateTimeline(){
+    const timeline=document.getElementById('careerTimeline');
+    if(!timeline)return;
+    const rect=timeline.getBoundingClientRect();
+    const start=innerHeight*.72;
+    const total=rect.height+innerHeight*.18;
+    const progressed=Math.min(Math.max((start-rect.top)/total,0),1);
+    timeline.style.setProperty('--timeline-progress',`${progressed*100}%`);
+  }
+
+  window.addEventListener('scroll',()=>{
+    const portrait=document.querySelector('.portrait-frame');
+    if(portrait&&innerWidth>900){const y=Math.min(scrollY*.032,24);portrait.style.transform=`translateY(${y}px)`}
+    updateTimeline();
+  },{passive:true});
+  updateTimeline();
+
+  document.querySelectorAll('.gallery-placeholder').forEach((box,i)=>{
+    const src=`assets/training-${String(i+1).padStart(2,'0')}.jpg`;
+    const img=new Image();
+    img.onload=()=>{
+      img.alt='Jahid Hassan Rakib training and career moment';
+      Object.assign(img.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'cover',zIndex:'0'});
+      box.prepend(img);
+      box.querySelectorAll('span,b').forEach(x=>x.style.textShadow='0 2px 20px rgba(0,0,0,.55)');
+    };
+    img.src=src;
+  });
+
+  const counters=document.querySelectorAll('[data-count]');
+  const counterObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(!entry.isIntersecting)return;
+    const el=entry.target;
+    const target=Number(el.dataset.count||0);
+    const suffix=el.dataset.suffix||'';
+    const start=performance.now();
+    const duration=900;
+    const tick=now=>{
+      const p=Math.min((now-start)/duration,1);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*eased)+suffix;
+      if(p<1)requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    counterObserver.unobserve(el);
+  }),{threshold:.65});
+  counters.forEach(el=>counterObserver.observe(el));
+
+  document.querySelectorAll('a[href]').forEach(link=>{
+    const href=link.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('mailto:')||href.startsWith('tel:')||link.target==='_blank')return;
+    let url;
+    try{url=new URL(link.href,location.href)}catch{return}
+    if(url.origin!==location.origin)return;
+    link.addEventListener('click',e=>{
+      if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+      e.preventDefault();
+      document.body.classList.add('page-leaving');
+      setTimeout(()=>location.href=url.href,210);
+    });
+  });
+});
