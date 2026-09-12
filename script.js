@@ -1,6 +1,29 @@
 document.addEventListener('DOMContentLoaded',()=>{
   requestAnimationFrame(()=>document.body.classList.add('page-ready'));
 
+  // Keep homepage summary cards aligned with the latest case-study content.
+  const homepageCardUpdates={
+    'work.html?category=design':{
+      metric:'20,000+ Design Deliverables',
+      description:'High-volume creative production across digital, print, packaging, events and corporate communication.'
+    },
+    'work.html?category=tech':{
+      metric:'3 Digital Business Systems',
+      description:'Digital Order Management, Logistics Route Planning, Outlet Visit & QC Tracking, with AI-ready workflow concepts.'
+    }
+  };
+  document.querySelectorAll('.discipline[href]').forEach(card=>{
+    const update=homepageCardUpdates[card.getAttribute('href')];
+    if(!update)return;
+    const chip=card.querySelector('.metric-chip');
+    if(chip){
+      chip.classList.remove('metric-placeholder');
+      chip.innerHTML='<i></i>'+update.metric;
+    }
+    const description=card.querySelector('h3 + p');
+    if(description)description.textContent=update.description;
+  });
+
   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(entry.isIntersecting){entry.target.classList.add('show');revealObserver.unobserve(entry.target)}
   }),{threshold:.1,rootMargin:'0px 0px -5% 0px'});
