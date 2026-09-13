@@ -40,6 +40,47 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(description)description.textContent=update.description;
   });
 
+  // About section: update education stack and current skill set.
+  const skillCloud=document.querySelector('.skill-cloud');
+  if(skillCloud){
+    [...skillCloud.querySelectorAll('span')].forEach(skill=>{
+      const label=skill.textContent.trim();
+      if(label==='OpenCV'||label==='TensorFlow/Keras')skill.remove();
+      else if(label==='Web')skill.textContent='Web Application';
+    });
+    const hasAfterEffects=[...skillCloud.querySelectorAll('span')].some(s=>s.textContent.trim()==='Adobe After Effects');
+    if(!hasAfterEffects){
+      const afterEffects=document.createElement('span');
+      afterEffects.textContent='Adobe After Effects';
+      const illustrator=[...skillCloud.querySelectorAll('span')].find(s=>s.textContent.trim()==='Illustrator');
+      if(illustrator)illustrator.after(afterEffects); else skillCloud.appendChild(afterEffects);
+    }
+  }
+
+  const aboutStack=document.querySelector('.about-stack');
+  if(aboutStack&&!aboutStack.querySelector('[data-diploma-card]')){
+    const diploma=document.createElement('div');
+    diploma.className='stack-card';
+    diploma.setAttribute('data-diploma-card','true');
+    diploma.innerHTML='<small>EDUCATION</small><strong>Diploma in Engineering — Computer Technology</strong><span>Daffodil Polytechnic Institute</span>';
+    const firstCard=aboutStack.querySelector('.stack-card');
+    if(firstCard)firstCard.after(diploma); else aboutStack.appendChild(diploma);
+
+    const cards=[...aboutStack.querySelectorAll('.stack-card')];
+    const positions=[
+      {top:'0px',left:'0%',rotate:'-3deg'},
+      {top:'120px',left:'11%',rotate:'2deg'},
+      {top:'240px',left:'4%',rotate:'-2deg'},
+      {top:'360px',left:'10%',rotate:'1deg'}
+    ];
+    cards.slice(0,4).forEach((card,i)=>{
+      card.style.top=positions[i].top;
+      card.style.left=positions[i].left;
+      card.style.transform=`rotate(${positions[i].rotate})`;
+    });
+    aboutStack.style.minHeight='540px';
+  }
+
   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(entry.isIntersecting){entry.target.classList.add('show');revealObserver.unobserve(entry.target)}
   }),{threshold:.1,rootMargin:'0px 0px -5% 0px'});
