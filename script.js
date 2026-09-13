@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     'work.html?category=tech':{
       metric:'3 Digital Business Systems',
       description:'Digital Order Management, Logistics Route Planning, Outlet Visit & QC Tracking, with AI-ready workflow concepts.'
+    },
+    'work.html?category=apparel':{
+      metric:'T-SHIRTS · HOODIES · MERCHANDISE',
+      description:'T-shirt, hoodie, merchandise and custom graphics for clients.'
+    },
+    'work.html?category=presentation':{
+      metric:'DATA → INSIGHT → DECISION',
+      description:'Management dashboards, proposals, reports and strategic presentations.'
     }
   };
   document.querySelectorAll('.discipline[href]').forEach(card=>{
