@@ -3,6 +3,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // Keep homepage summary cards aligned with the latest case-study content.
   const homepageCardUpdates={
+    'work.html?category=intelligence':{
+      metric:'181 Valid Survey Responses',
+      description:'Consumer research, survey analysis, product insight and management-ready dashboards for business decisions.'
+    },
+    'work.html?category=digital':{
+      metric:'772.8K Views · 243.9K Viewers',
+      description:'Multi-brand social media management, content planning, boosting and campaign performance analysis.'
+    },
     'work.html?category=design':{
       metric:'20,000+ Design Deliverables',
       description:'High-volume creative production across digital, print, packaging, events and corporate communication.'
