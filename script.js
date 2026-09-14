@@ -1,6 +1,16 @@
 document.addEventListener('DOMContentLoaded',()=>{
   requestAnimationFrame(()=>document.body.classList.add('page-ready'));
 
+  // Add Certifications to the main portfolio navigation without changing the existing layout structure.
+  const mainNav=document.querySelector('.navlinks');
+  if(mainNav&&!mainNav.querySelector('a[href="certifications.html"]')){
+    const experienceLink=mainNav.querySelector('a[href="#experience"]');
+    const certLink=document.createElement('a');
+    certLink.href='certifications.html';
+    certLink.textContent='Certifications';
+    if(experienceLink)experienceLink.after(certLink); else mainNav.appendChild(certLink);
+  }
+
   // Keep homepage summary cards aligned with the latest case-study content.
   const homepageCardUpdates={
     'work.html?category=intelligence':{
