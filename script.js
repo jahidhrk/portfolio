@@ -76,19 +76,33 @@ document.addEventListener('DOMContentLoaded',()=>{
     const firstCard=aboutStack.querySelector('.stack-card');
     if(firstCard)firstCard.after(diploma); else aboutStack.appendChild(diploma);
 
-    const cards=[...aboutStack.querySelectorAll('.stack-card')];
-    const positions=[
-      {top:'0px',left:'0%',rotate:'-3deg'},
-      {top:'120px',left:'11%',rotate:'2deg'},
-      {top:'240px',left:'4%',rotate:'-2deg'},
-      {top:'360px',left:'10%',rotate:'1deg'}
+    // Keep every institution name fully visible instead of letting the next card cover it.
+    const cards=[...aboutStack.querySelectorAll('.stack-card')].slice(0,4);
+    const visual=[
+      {left:'0%',rotate:'-3deg'},
+      {left:'11%',rotate:'2deg'},
+      {left:'4%',rotate:'-2deg'},
+      {left:'10%',rotate:'1deg'}
     ];
-    cards.slice(0,4).forEach((card,i)=>{
-      card.style.top=positions[i].top;
-      card.style.left=positions[i].left;
-      card.style.transform=`rotate(${positions[i].rotate})`;
+
+    // Replace the generic tech-school line with the actual training institutions.
+    const techCard=cards.find(card=>card.querySelector('strong')?.textContent.includes('Android Apps Development'));
+    if(techCard){
+      const institution=techCard.querySelector('span');
+      if(institution)institution.textContent='US Software Ltd. · BSDI';
+    }
+
+    requestAnimationFrame(()=>{
+      let top=0;
+      const gap=18;
+      cards.forEach((card,i)=>{
+        card.style.top=top+'px';
+        card.style.left=visual[i].left;
+        card.style.transform=`rotate(${visual[i].rotate})`;
+        top+=card.offsetHeight+gap;
+      });
+      aboutStack.style.minHeight=(top+18)+'px';
     });
-    aboutStack.style.minHeight='540px';
   }
 
   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
