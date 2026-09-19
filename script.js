@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       metric:'20,000+ Design Deliverables',
       description:'High-volume creative production across digital, print, packaging, events and corporate communication.'
     },
+    'work.html?category=activation':{
+      metric:'12 Documented Events · 4 Featured Cases',
+      description:'Exhibition branding, franchise activations, print-ready POSM and event coordination across 2024–2026.'
+    },
     'work.html?category=tech':{
       metric:'3 Digital Business Systems',
       description:'Digital Order Management, Logistics Route Planning, Outlet Visit & QC Tracking, with AI-ready workflow concepts.'
