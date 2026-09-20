@@ -124,3 +124,10 @@
  .raphael-core,.raphael-halo{animation:none!important}
  .raphael-avatar:hover{transform:none}
 }
+
+
+/* Character can be picked up and moved on desktop; mobile keeps a compact stable companion. */
+.raphael-avatar{cursor:grab;touch-action:pan-y}
+.raphael-stage.is-dragging{transition:none!important}
+.raphael-stage.is-dragging .raphael-avatar{cursor:grabbing;filter:drop-shadow(0 18px 29px rgba(14,36,64,.3))}
+@media(max-width:850px){.raphael-avatar{cursor:pointer}}
