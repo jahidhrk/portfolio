@@ -99,7 +99,7 @@ creative:{title:'Creative Direction & Visual Production',intro:'Art direction an
 };
 const order=['modeling','design','creative','packaging','digital','intelligence','tech','apparel','presentation','activation'];
 const q=new URLSearchParams(location.search).get('category');const active=cases[q]||cases.modeling;const activeKey=cases[q]?q:'modeling';
-const filters=document.getElementById('filters');order.forEach(k=>{const b=document.createElement('button');b.textContent=cases[k].filterTitle||cases[k].title;b.className=k===activeKey?'active':'';b.onclick=()=>location.href='work.html?category='+k;filters.appendChild(b)});
+const filters=document.getElementById('filters');order.forEach((k,i)=>{const b=document.createElement('button');b.textContent=String(i+1).padStart(2,'0')+' / '+(cases[k].filterTitle||cases[k].title);b.className=k===activeKey?'active':'';b.onclick=()=>location.href='work.html?category='+k;filters.appendChild(b)});
 document.getElementById('caseLabel').textContent=active.topLabel||'SELECTED WORK · MINI CASE STUDY';document.getElementById('metricLabel').textContent=active.metricLabel||'MEASURABLE OUTCOME';document.getElementById('title').textContent=active.title+'.';document.getElementById('intro').textContent=active.intro;document.getElementById('metric').textContent=active.metric;const metricNote=document.getElementById('metricNote');if(active.metricNoteHtml){metricNote.innerHTML=active.metricNoteHtml}else{metricNote.textContent=active.metricNote||''}document.title=active.title+' | Jahid Hassan Rakib Portfolio';
 const visuals=document.getElementById('visuals');const freshTech=Date.now();
 if(activeKey==='packaging')visuals.classList.add('packaging-gallery');
