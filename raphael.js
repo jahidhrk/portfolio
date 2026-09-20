@@ -267,7 +267,8 @@ const remarks={
 function onSection(key){
  currentSection=key;
  if(lastSection!==key){
-  lastSection=key;manualUntil=0;roamX=0;roamY=0;inspectElement=null;reposition();mood('observing',2300);
+  lastSection=key;manualUntil=0;roamX=0;roamY=0;inspectElement=null;reposition();
+  setTimeout(()=>{if(currentSection===key&&!open&&!minimized)mood('observing',2300);},1480);
   if(!open&&!minimized&&!quiet&&!reduced.matches&&remarks[key]&&Date.now()-remarkAt>49000&&Math.random()<.42){
    remarkAt=Date.now();bubbleSay(remarks[key],false,3800);
   }
@@ -288,7 +289,7 @@ document.querySelectorAll('.discipline[href*="work.html?category="], .case-visua
    hoverProject=match?.[1]||workKey||null;hoverExpires=Date.now()+16000;
    inspectElement=el;inspectUntil=Date.now()+7000;roamX=0;roamY=0;reposition();
    setTimeout(()=>{if(Date.now()>=inspectUntil){inspectElement=null;reposition();}},7500);
-   mood('observing',3600);
+   setTimeout(()=>{if(inspectElement===el&&!open)mood('observing',3600);},1460);
    if(Date.now()-hoverAt>38000&&Math.random()<.72){
     hoverAt=Date.now();bubbleSay(say("Ah, you're looking at that one. Ask me about it.","এই কাজটা দেখছো? চাইলে বুঝিয়ে বলি।"),false,3600);
    }
@@ -306,7 +307,8 @@ function idleCycle(){
   if(!document.hidden&&!open&&!minimized&&!reduced.matches){
    const states=['idle','curious','observing','sitting','standing','waving','thinking','sleeping'];
    mood(states[Math.floor(Math.random()*states.length)],2700+Math.random()*1400);
-   if(!mobile.matches&&!manualUntil&&!inspectElement){roamX=(Math.random()-.5)*55;roamY=(Math.random()-.5)*38;reposition();}
+   if(inspectElement&&inspectUntil<Date.now())inspectElement=null;
+   if(!mobile.matches&&manualUntil<Date.now()&&!inspectElement){roamX=(Math.random()-.5)*55;roamY=(Math.random()-.5)*38;reposition();}
   }
   idleCycle();
  },20000+Math.random()*15000);
