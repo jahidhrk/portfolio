@@ -1,0 +1,10 @@
+name = "jahid-raphael-ai"
+main = "workers/raphael-ai.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+GEMINI_MODEL = "gemini-2.5-flash-lite"
+
+# GEMINI_API_KEY MUST be stored as a Cloudflare Worker secret.
+# Never add the API key to this file, GitHub, or raphael-ai-config.js.
