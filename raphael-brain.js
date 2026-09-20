@@ -113,6 +113,27 @@
       return this.remember(input,this.credentialsAnswer(q));
     }
 
+    if (has(q,['current role','his role','jahid role','job title','designation','his position','where does he work','what company does he work','what is his job','তার পদবি','কোন পদে','বর্তমান চাকরি','কোথায় কাজ করেন','কোথায় কাজ করেন'])) {
+      return this.remember(input,make(
+        t("Jahid's published current role is "+K.owner.role+" at "+K.owner.company+". His focus is "+K.owner.focus+".",
+          "জাহিদের প্রকাশিত বর্তমান পদবি "+K.owner.role+" — "+K.owner.company+"। তাঁর ফোকাস "+K.owner.focus+"।"),
+        'experience',routeFor('experience'),'helping',['Show his career','View his CV']));
+    }
+    if (has(q,['how many events','number of events','how many exhibitions','event count','documented events','কতগুলো ইভেন্ট','কয়টি ইভেন্ট','কয়টি ইভেন্ট'])) {
+      return this.remember(input,make(
+        t("The portfolio identifies 12 distinct events in company correspondence from 2024–2026, including four featured cases with email evidence. Some entries document company participation rather than Jahid's individual deliverables.",
+          "পোর্টফোলিওতে ২০২৪–২০২৬ সালের কোম্পানির যোগাযোগে ১২টি স্বতন্ত্র ইভেন্ট শনাক্ত করা হয়েছে; চারটি ইভেন্টের ইমেইল-ভিত্তিক কেস আছে। সব এন্ট্রি জাহিদের ব্যক্তিগত কাজ নয়; কিছুতে কোম্পানির অংশগ্রহণ নথিভুক্ত।"),
+        'activation',routeFor('activation'),'helping',['Open event work','Show his work']));
+    }
+    const employer=K.career.find(job=>job.company!=='C.P. Bangladesh Co., Ltd.' && 
+      has(q,[job.company,job.company.split(' ')[0]]) && has(q,['where','role','did','worked','work','about','experience','job','কাজ','চাকরি','পদবি']));
+    if (employer) {
+      return this.remember(input,make(
+        employer.period+' · '+employer.company+' — '+employer.role+'. '+employer.detail,
+        'experience',routeFor('experience'),'helping',['Show his career','View his CV']));
+    }
+
+
     const clarify = text => make(text,'general',null,'thinking',['Show his work','What is he building?']);
     const workMatch = (() => {
       const scores = K.work.map(work => {
