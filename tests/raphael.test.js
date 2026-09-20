@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
 function read(path){return fs.readFileSync(path,'utf8');}
-for(const path of ['script.js','raphael-knowledge.js','raphael-brain.js','raphael.js']){
+for(const path of ['script.js','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js','scripts/build-raphael-corpus.js']){
   new vm.Script(read(path),{filename:path});
 }
 for(const page of ['index.html','work.html','certifications.html','cv.html']){
   const html=read(page);
-  for(const file of ['raphael.css','raphael-knowledge.js','raphael-brain.js','raphael.js']){
+  for(const file of ['raphael.css','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js']){
     assert(html.includes(file),page+' missing Raphael asset: '+file);
   }
 }
@@ -25,7 +25,10 @@ const context={
 };
 vm.createContext(context);
 vm.runInContext(read('raphael-knowledge.js'),context);
+vm.runInContext(read('raphael-corpus.js'),context);
 vm.runInContext(read('raphael-brain.js'),context);
+assert(context.window.RAPHAEL_CORPUS.entries.length>=70,'Portfolio corpus unexpectedly incomplete');
+assert.equal(context.window.RAPHAEL_CORPUS.entries.filter(x=>x.type==='certificate').length,7,'Seven published credentials must be indexed');
 const brain=new context.window.RaphaelBrain();
 const current={section:'work',project:'modeling',title:'SketchUp 3D Modeling & Layout Design',excerpt:'Event & Exhibition Layout'};
 const cases=[
@@ -40,7 +43,14 @@ const cases=[
   ['Open this case study','modeling','work.html?category=modeling'],
   ['What is his salary?','general'],
   ['View his CV','cv','cv.html'],
-  ['What is his email?','contact','index.html#contact']
+  ['What is his email?','contact','index.html#contact'],
+  ['Where is his certificate?','certifications','certifications.html'],
+  ['Which certificates does he have?','certifications','certifications.html'],
+  ['What is Josephite Intra Math Fiesta?','activation','work.html?category=activation'],
+  ['Tell me about Italian Chili Bologna','packaging','work.html?category=packaging'],
+  ['What is his role?','experience','index.html#experience'],
+  ['How many events?','activation','work.html?category=activation'],
+  ['What did he do at Diens Corporation?','experience','index.html#experience']
 ];
 for(const [input,topic,route] of cases){
   const result=brain.reply(input,current);
@@ -48,7 +58,10 @@ for(const [input,topic,route] of cases){
   if(route)assert.equal(result.route,route,'Wrong destination for: '+input);
   assert(result.text&&typeof result.text==='string');
 }
+assert(read('raphael.js').includes('raphael-voice-select'),'Voice selector is missing');
+assert(read('raphael.js').includes('is-dragging'),'Raphael drag motion is missing');
+assert(read('raphael.css').includes('raphael-voice-settings'),'Voice UI style is missing');
 assert(!/sk-[A-Za-z0-9]{20,}/.test(
-  ['raphael-knowledge.js','raphael-brain.js','raphael.js'].map(read).join('')),
+  ['raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js'].map(read).join('')),
   'Potential API key in client script');
-console.log('Raphael: script syntax, page integration, Work archive, 12 conversation scenarios and key check passed.');
+console.log('Raphael: script syntax, page integration, Work archive, 19 conversation scenarios and key check passed.');
