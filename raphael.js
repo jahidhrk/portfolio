@@ -15,6 +15,7 @@ const voiceSelect=$('#raphael-voice-select'),voiceRate=$('#raphael-voice-rate'),
 let browserVoices=[],selectedVoiceURI='';
 let open=false,minimized=false,voice=false,quiet=false,currentSection='hero',lastSection='hero',hoverProject=null,hoverExpires=0,bubbleTimer=0,moodTimer=0,ambientTimer=0,hoverTimer=0,remarkAt=0,hoverAt=0,lastFocus=null,previousX=null,previousY=null,ticking=false;
 const page=location.pathname.split('/').pop()||'index.html',isHome=page==='index.html',isWork=page==='work.html',workKey=isWork?new URLSearchParams(location.search).get('category')||'modeling':null;
+let inspectElement=null,inspectUntil=0,roamX=0,roamY=0,manualUntil=0,dragging=false;
 const sections=isHome?[['hero',document.querySelector('.hero')],['work',document.getElementById('work')],['now',document.getElementById('now')],['experience',document.getElementById('experience')],['gallery',document.getElementById('gallery')],['about',document.getElementById('about')],['contact',document.getElementById('contact')]].filter(item=>item[1]):[];
 function mood(value,duration=4300){
  if(reduced.matches||minimized)value='idle';
@@ -56,12 +57,12 @@ function show(){
  open=true;root.classList.add('is-open');panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');
  avatar.setAttribute('aria-expanded','true');beacon.setAttribute('aria-expanded','true');
  bubble.classList.remove('is-visible');clearTimeout(bubbleTimer);
- lastFocus=document.activeElement;setTimeout(()=>input.focus({preventScroll:true}),120);
+ lastFocus=document.activeElement;reposition();setTimeout(()=>input.focus({preventScroll:true}),120);
 }
 function close(){
  open=false;root.classList.remove('is-open');panel.classList.remove('is-open');panel.setAttribute('aria-hidden','true');
  avatar.setAttribute('aria-expanded','false');beacon.setAttribute('aria-expanded','false');
- if(speech)speech.cancel();mood('idle',0);
+ if(speech)speech.cancel();mood('idle',0);reposition();
  if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});
 }
 function minimize(){
@@ -126,6 +127,44 @@ function ask(message){
  const direct=/\b(show|take me|go to|open|navigate|bring me|visit|jump to)\b|দেখাও|নিয়ে যাও|নিয়ে যাও|খুলে দাও/i.test(q);
  if(reply.route&&direct)setTimeout(()=>{if(!document.hidden)navigate(reply.route);},1400);
 }
+// Drag Raphael gently on desktop: pointer movement changes the body, not the page.
+let dragStart=null,suppressAvatarClick=false;
+avatar.addEventListener('pointerdown',event=>{
+ if(mobile.matches||event.button!==0||open)return;
+ dragStart={pointer:event.pointerId,x:event.clientX,y:event.clientY,left:previousX||0,top:previousY||0,moved:false};
+});
+avatar.addEventListener('pointermove',event=>{
+ if(!dragStart||event.pointerId!==dragStart.pointer)return;
+ const dx=event.clientX-dragStart.x,dy=event.clientY-dragStart.y;
+ if(Math.hypot(dx,dy)>8)dragStart.moved=true;
+ if(!dragStart.moved)return;
+ dragging=true;stage.classList.add('is-dragging');mood('walking',0);
+ previousX=Math.max(6,Math.min(innerWidth-115,dragStart.left+dx));
+ previousY=Math.max(65,Math.min(innerHeight-165,dragStart.top+dy));
+ stage.style.transform='translate3d('+Math.round(previousX)+'px,'+Math.round(previousY)+'px,0)';
+});
+function stopDrag(){
+ if(!dragStart)return;
+ if(dragStart.moved){
+   suppressAvatarClick=true;manualUntil=Date.now()+30000;
+   setTimeout(()=>{suppressAvatarClick=false;},180);
+ }
+ dragStart=null;dragging=false;stage.classList.remove('is-dragging');mood('observing',2200);
+}
+avatar.addEventListener('pointerup',stopDrag);
+avatar.addEventListener('pointercancel',stopDrag);
+avatar.addEventListener('click',event=>{if(suppressAvatarClick){event.preventDefault();event.stopImmediatePropagation();}},true);
+avatar.addEventListener('keydown',event=>{
+ if(mobile.matches||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+ event.preventDefault();manualUntil=Date.now()+30000;
+ const dx=event.key==='ArrowLeft'?-20:event.key==='ArrowRight'?20:0;
+ const dy=event.key==='ArrowUp'?-20:event.key==='ArrowDown'?20:0;
+ previousX=Math.max(6,Math.min(innerWidth-115,(previousX||0)+dx));
+ previousY=Math.max(65,Math.min(innerHeight-165,(previousY||0)+dy));
+ stage.style.transform='translate3d('+Math.round(previousX)+'px,'+Math.round(previousY)+'px,0)';
+ mood('walking',350);
+});
+
 avatar.addEventListener('click',show);beacon.addEventListener('click',show);bubble.addEventListener('click',show);
 $('#raphael-close').addEventListener('click',close);
 $('#raphael-minimize').addEventListener('click',minimize);
@@ -166,22 +205,58 @@ function locate(){
  return choice;
 }
 function reposition(){
- if(minimized)return;
- const width=innerWidth,height=innerHeight;let x,y;
- if(mobile.matches){x=width-74;y=height-175;}
- else if(currentSection==='hero'&&isHome){
-  const el=document.querySelector('.portrait-frame'),b=el?.getBoundingClientRect();
-  x=b?b.right-79:width-153;y=b?b.bottom-111:height*.53;
- }else{
-  const el=sections.find(item=>item[0]===currentSection)?.[1];
-  const b=el?.getBoundingClientRect();
-  x=width-153;y=b?Math.min(height*.63,Math.max(height*.25,b.top+140)):height*.51;
+ if(minimized||dragging)return;
+ const width=innerWidth,height=innerHeight;
+ if(manualUntil>Date.now()&&!open&&lastSection===currentSection)return;
+ let x=width-140,y=height*.5;
+ if(mobile.matches){
+   x=width-79;y=height-188;
+ }else if(open){
+   const p=panel.getBoundingClientRect();
+   x=Math.max(8,p.left-126);y=Math.max(70,p.top+36);
+ }else if(inspectElement&&inspectUntil>Date.now()){
+   const b=inspectElement.getBoundingClientRect();
+   if(b.bottom>80&&b.top<height-60){
+     x=b.right+10+110<width?b.right+10:b.right-95;
+     y=Math.max(85,b.top-104);
+   }else inspectElement=null;
  }
- x=Math.max(8,Math.min(x,width-(mobile.matches?74:112)));
- y=Math.max(60,Math.min(y,height-(mobile.matches?158:175)));
- if(previousX!==null&&Math.hypot(x-previousX,y-previousY)>44&&!reduced.matches)mood('walking',1040);
- previousX=x;previousY=y;stage.style.transform='translate3d('+Math.round(x)+'px,'+Math.round(y)+'px,0)';
+ if(!mobile.matches&&!open&&(!inspectElement||inspectUntil<=Date.now())){
+   let anchor=null;
+   if(currentSection==='hero'&&isHome){
+     anchor=document.querySelector('.portrait-frame');
+     if(anchor){const b=anchor.getBoundingClientRect();x=b.right-54;y=b.bottom-105;}
+   }else{
+     const select={
+       work:'.discipline-grid .discipline',
+       now:'.build-showcase',
+       experience:'.career-row',
+       gallery:'#gallery',
+       about:'.about-panel',
+       contact:'.contact-layout'
+     };
+     const els=[...document.querySelectorAll(select[currentSection]||'#__raphael_no_target')];
+     anchor=els.find(el=>{const b=el.getBoundingClientRect();return b.bottom>140&&b.top<height*.77;})||els[0];
+     if(anchor){
+       const b=anchor.getBoundingClientRect();
+       x=b.right+116<width?b.right+10:b.right-91;
+       y=b.top-101;
+       if(y<90)y=Math.min(height*.64,b.top+Math.min(b.height*.3,160));
+     }else{
+       const el=sections.find(item=>item[0]===currentSection)?.[1];
+       const b=el?.getBoundingClientRect();
+       x=width-139;y=b?Math.max(105,Math.min(height*.6,b.top+135)):height*.47;
+     }
+   }
+   x+=roamX;y+=roamY;
+ }
+ x=Math.max(6,Math.min(x,width-(mobile.matches?78:114)));
+ y=Math.max(66,Math.min(y,height-(mobile.matches?164:165)));
+ if(previousX!==null&&Math.hypot(x-previousX,y-previousY)>32&&!reduced.matches)mood('walking',1250);
+ previousX=x;previousY=y;
+ stage.style.transform='translate3d('+Math.round(x)+'px,'+Math.round(y)+'px,0)';
 }
+
 const remarks={
  work:say("Ah, you are exploring his work. I know these projects.","তাঁর কাজগুলো দেখছো? এগুলো আমার চেনা।"),
  now:say("That one is still being built. Ask me about it.","এটি এখনো তৈরি হচ্ছে। জানতে চাইলে বলো।"),
@@ -192,7 +267,7 @@ const remarks={
 function onSection(key){
  currentSection=key;
  if(lastSection!==key){
-  lastSection=key;reposition();mood('observing',2300);
+  lastSection=key;manualUntil=0;roamX=0;roamY=0;inspectElement=null;reposition();mood('observing',2300);
   if(!open&&!minimized&&!quiet&&!reduced.matches&&remarks[key]&&Date.now()-remarkAt>49000&&Math.random()<.42){
    remarkAt=Date.now();bubbleSay(remarks[key],false,3800);
   }
@@ -211,6 +286,8 @@ document.querySelectorAll('.discipline[href*="work.html?category="], .case-visua
   clearTimeout(hoverTimer);hoverTimer=setTimeout(()=>{
    const match=(el.getAttribute('href')||'').match(/category=([\w-]+)/);
    hoverProject=match?.[1]||workKey||null;hoverExpires=Date.now()+16000;
+   inspectElement=el;inspectUntil=Date.now()+7000;roamX=0;roamY=0;reposition();
+   setTimeout(()=>{if(Date.now()>=inspectUntil){inspectElement=null;reposition();}},7500);
    mood('observing',3600);
    if(Date.now()-hoverAt>38000&&Math.random()<.72){
     hoverAt=Date.now();bubbleSay(say("Ah, you're looking at that one. Ask me about it.","এই কাজটা দেখছো? চাইলে বুঝিয়ে বলি।"),false,3600);
@@ -229,6 +306,7 @@ function idleCycle(){
   if(!document.hidden&&!open&&!minimized&&!reduced.matches){
    const states=['idle','curious','observing','sitting','standing','waving','thinking','sleeping'];
    mood(states[Math.floor(Math.random()*states.length)],2700+Math.random()*1400);
+   if(!mobile.matches&&!manualUntil&&!inspectElement){roamX=(Math.random()-.5)*55;roamY=(Math.random()-.5)*38;reposition();}
   }
   idleCycle();
  },20000+Math.random()*15000);
