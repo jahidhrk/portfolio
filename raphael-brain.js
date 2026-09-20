@@ -108,8 +108,9 @@
       else response=clarify(t("Of course. Which project or part of his background should I unpack?",
                               "অবশ্যই। কোন প্রজেক্ট বা অভিজ্ঞতার বিষয়ে বিস্তারিত জানতে চাও?"));
     } else if (has(q,['show me','take me there','go there','open it','open this case study','show it','view it','navigate there','দেখাও','নিয়ে যাও','নিয়ে যাও']) && !workMatch && this.topic && !has(q,['now','experience','work','contact','cv','certification','about','current'])) {
-      const route=routeFor(this.topic)||this.lastRoute;
-      response=route?make(t("Come, I'll show you.", "চলো, দেখাই।"),this.topic,route,'pointing'):
+      const destination=has(q,['this case study','this project','this page'])?(lookingAt?.key||this.topic):this.topic;
+      const route=routeFor(destination)||this.lastRoute;
+      response=route?make(t("Come, I'll show you.", "চলো, দেখাই।"),destination,route,'pointing'):
         clarify(t("Where should I take you?", "কোথায় নিয়ে যাব?"));
     } else if (has(q,['what is jahid building','what is he building','now building','current project','paperless','manufacturing','batch traceability','factory','production','warehouse','qc/qa','এখন কী করছেন','কি বানাচ্ছে','কী বানাচ্ছে','বর্তমান প্রজেক্ট'])) {
       response=this.nowAnswer(false,nav);
