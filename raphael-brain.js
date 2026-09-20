@@ -69,7 +69,7 @@
     const nav = has(q,navWords);
     const lookingAt = workByKey(context.project);
     const last = workByKey(this.topic);
-    const current = lookingAt || last;
+    const current = last || lookingAt;
     let response;
     if (!q) return make(shortList, 'general');
     const clarify = text => make(text,'general',null,'thinking',['Show his work','What is he building?']);
