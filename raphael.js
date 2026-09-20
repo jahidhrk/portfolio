@@ -50,6 +50,7 @@ function navigate(href){
 }
 function show(){
  if(minimized)restore();
+ if(open){input.focus({preventScroll:true});return;}
  open=true;root.classList.add('is-open');panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');
  avatar.setAttribute('aria-expanded','true');beacon.setAttribute('aria-expanded','true');
  bubble.classList.remove('is-visible');clearTimeout(bubbleTimer);
