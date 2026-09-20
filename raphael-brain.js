@@ -26,7 +26,7 @@
     cv: ['cv', 'resume', 'résumé', 'সিভি'],
     gallery: ['life and learning', 'life & learning', 'gallery', 'photos', 'গ্যালারি']
   };
-  const navWords = ['show','take me','go to','open','navigate','bring me','let me see','visit','jump to','দেখাও','নিয়ে যাও','নিয়ে যাও','দেখতে চাই','খুলে দাও','যাও'];
+  const navWords = ['show','view','take me','go to','open','navigate','bring me','let me see','visit','jump to','দেখাও','নিয়ে যাও','নিয়ে যাও','দেখতে চাই','খুলে দাও','যাও'];
   const shortList = t('You can ask about his work, current project, career, skills, education or how to contact him.',
                       'তাঁর কাজ, বর্তমান প্রজেক্ট, ক্যারিয়ার, দক্ষতা, শিক্ষা বা যোগাযোগের উপায় জানতে পারো।');
 
@@ -107,7 +107,7 @@
       else if (this.topic==='education'||this.topic==='certifications')response=this.educationAnswer();
       else response=clarify(t("Of course. Which project or part of his background should I unpack?",
                               "অবশ্যই। কোন প্রজেক্ট বা অভিজ্ঞতার বিষয়ে বিস্তারিত জানতে চাও?"));
-    } else if (has(q,['show me','take me there','go there','open it','show it','navigate there','দেখাও','নিয়ে যাও','নিয়ে যাও']) && !workMatch && this.topic && !has(q,['now','experience','work','contact','cv','certification','about','current'])) {
+    } else if (has(q,['show me','take me there','go there','open it','open this case study','show it','view it','navigate there','দেখাও','নিয়ে যাও','নিয়ে যাও']) && !workMatch && this.topic && !has(q,['now','experience','work','contact','cv','certification','about','current'])) {
       const route=routeFor(this.topic)||this.lastRoute;
       response=route?make(t("Come, I'll show you.", "চলো, দেখাই।"),this.topic,route,'pointing'):
         clarify(t("Where should I take you?", "কোথায় নিয়ে যাব?"));
@@ -117,7 +117,7 @@
       response=this.careerAnswer(has(q,['before','previous','past','আগে']),nav);
     } else if (has(q,['education','degree','university','diploma','study','studied','training','certifications','certificates','qualification','শিক্ষা','বিশ্ববিদ্যালয়','ডিপ্লোমা','সার্টিফিকেট','প্রশিক্ষণ'])) {
       response=this.educationAnswer(nav,has(q,['training','certifications','certificates','সার্টিফিকেট','প্রশিক্ষণ']));
-    } else if (has(q,['skills','strengths','capabilities','what does he do','what do you do','expertise','দক্ষতা','কী পারেন','কি পারেন'])) {
+    } else if (has(q,['skills','strengths','capabilities','what does he do','what does jahid do','what does rakib do','what do you do','expertise','দক্ষতা','কী পারেন','কি পারেন'])) {
       response=make(t("He works across marketing intelligence, research and data analysis; social media and campaigns; graphic design and packaging; creative direction, events and SketchUp layouts; and digital systems. His focus is Data × Digital × Design.",
                         "তাঁর কাজে আছে মার্কেটিং ইন্টেলিজেন্স, গবেষণা ও ডেটা অ্যানালাইসিস; সোশ্যাল মিডিয়া ও ক্যাম্পেইন; গ্রাফিক ও প্যাকেজিং ডিজাইন; ক্রিয়েটিভ ডিরেকশন, ইভেন্ট ও SketchUp লেআউট; এবং ডিজিটাল সিস্টেম। মূল ফোকাস Data × Digital × Design।"),'work',nav?routeFor('work'):null,'helping',['Show his work','What is he building?']);
     } else if (has(q,['contact','email','linkedin','hire','reach him','message him','github','cv','resume','সিভি','যোগাযোগ','ইমেইল','মেইল','লিংকডইন'])) {
@@ -167,10 +167,10 @@
       'certifications',nav?routeFor('certifications'):null,'helping',['Open certifications','View his CV']);
   };
   Brain.prototype.contactAnswer = function (q, nav) {
-    const route=has(q,['cv','resume','সিভি'])?'cv':has(q,['github'])?'github':'contact';
+    const route=has(q,['cv','resume','সিভি'])?'cv':'contact';
     let answer=t('You can reach Jahid at '+K.owner.email+'. LinkedIn: '+K.owner.linkedin+'. Public GitHub: '+K.owner.github+'. His CV is also on the site.',
                  'জাহিদের ইমেইল '+K.owner.email+'। LinkedIn: '+K.owner.linkedin+'। GitHub: '+K.owner.github+'। সাইটে CV-ও আছে।');
-    return make(answer,route,nav?routeFor(route):null,'helping',['Open contact','View his CV']);
+    return make(answer,route,routeFor(route),'helping',['Open contact','View his CV']);
   };
   window.RaphaelBrain = Brain;
 })();
