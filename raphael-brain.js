@@ -107,7 +107,7 @@
       else if (this.topic==='education'||this.topic==='certifications')response=this.educationAnswer();
       else response=clarify(t("Of course. Which project or part of his background should I unpack?",
                               "অবশ্যই। কোন প্রজেক্ট বা অভিজ্ঞতার বিষয়ে বিস্তারিত জানতে চাও?"));
-    } else if (has(q,['show me','take me there','go there','open it','open this case study','show it','view it','navigate there','দেখাও','নিয়ে যাও','নিয়ে যাও']) && !workMatch && this.topic && !has(q,['now','experience','work','contact','cv','certification','about','current'])) {
+    } else if (has(q,['show me','take me there','go there','open it','open this case study','show it','view it','navigate there','দেখাও','নিয়ে যাও','নিয়ে যাও']) && !workMatch && this.topic && !has(q,['now','experience','work','কাজ','project','প্রজেক্ট','contact','cv','certification','about','current'])) {
       const destination=has(q,['this case study','this project','this page'])?(lookingAt?.key||this.topic):this.topic;
       const route=routeFor(destination)||this.lastRoute;
       response=route?make(t("Come, I'll show you.", "চলো, দেখাই।"),destination,route,'pointing'):
@@ -153,7 +153,7 @@
   Brain.prototype.nowAnswer = function (detail, nav) {
     const n=K.now;
     const text=t("He's currently building "+n.title+". "+n.detail+" The planned flow is "+n.flow+". "+(detail?n.objectives+' '+n.disclaimer:n.disclaimer),
-                 "তিনি এখন "+n.title+" নিয়ে কাজ করছেন। "+n.detail+" ধাপগুলো: "+n.flow+"। "+(detail?n.objectives+' ':'')+n.disclaimer);
+                 "জাহিদ এখন "+n.title+" প্রকল্পে কাজ করছেন। খাদ্য উৎপাদনের বিচ্ছিন্ন কাগজের রেকর্ডকে কাঠামোবদ্ধ ডিজিটাল ওয়ার্কফ্লোতে আনার কাজ চলছে। ধাপগুলো: "+n.flow+"। "+(detail?"লক্ষ্য: পেপারলেস অপারেশন, ব্যাচ ট্রেসেবিলিটি, ডেটা দৃশ্যমানতা ও প্রক্রিয়া পর্যবেক্ষণ। ":"")+"প্রকল্পটি এখনো নির্মাণাধীন; পরিকল্পিত সুবিধাগুলোকে অর্জিত ফল বলা হচ্ছে না।");
     return make(text,'now',nav?routeFor('now'):null,'excited',['Show me','Tell me more']);
   };
   Brain.prototype.careerAnswer = function (detailed, nav) {
