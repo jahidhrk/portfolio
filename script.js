@@ -54,6 +54,38 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(description)description.textContent=update.description;
   });
 
+  // The first Work card previews the uploaded 3D video when available; otherwise it retains the designed fallback.
+  const home3d=document.querySelector('.modeling-home-media');
+  const home3dVideo=home3d?.querySelector('.modeling-home-video');
+  if(home3d&&home3dVideo){
+    const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const startPreview=()=>{
+      if(!home3dVideo.dataset.loaded){
+        home3dVideo.dataset.loaded='1';
+        home3dVideo.src=home3dVideo.dataset.src;
+        home3dVideo.load();
+      }
+      if(home3dVideo.readyState>=1&&!reducedMotion)home3dVideo.play().catch(()=>{});
+    };
+    home3dVideo.addEventListener('loadedmetadata',()=>{
+      home3d.classList.add('has-video');
+      if(!reducedMotion&&!document.hidden)home3dVideo.play().catch(()=>{});
+    });
+    home3dVideo.addEventListener('error',()=>{
+      home3d.classList.remove('has-video');
+      home3dVideo.removeAttribute('src');
+    });
+    if('IntersectionObserver' in window){
+      const previewObserver=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting)startPreview();
+          else if(!home3dVideo.paused)home3dVideo.pause();
+        });
+      },{rootMargin:'120px 0px',threshold:.1});
+      previewObserver.observe(home3d);
+    }else startPreview();
+  }
+
   // About section: update education stack and current skill set.
   const skillCloud=document.querySelector('.skill-cloud');
   if(skillCloud){
