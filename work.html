@@ -63,6 +63,8 @@
 @media(max-width:850px){.packaging-gallery .case-visual,.packaging-gallery .case-visual:first-child{min-height:260px}}
 
 </style>
+
+<link rel="stylesheet" href="raphael.css">
 </head>
 <body>
 <div class="cursor-dot" aria-hidden="true"></div>
@@ -252,4 +254,6 @@ requestAnimationFrame(()=>document.body.classList.add('page-ready'));
 const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 const cursor=document.querySelector('.cursor-dot');if(cursor){window.addEventListener('pointermove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});document.querySelectorAll('a,button,.case-visual').forEach(el=>{el.addEventListener('pointerenter',()=>document.body.classList.add('link-hover'));el.addEventListener('pointerleave',()=>document.body.classList.remove('link-hover'))})}
 </script>
+
+<script defer src="raphael-knowledge.js"></script><script defer src="raphael-brain.js"></script><script defer src="raphael.js"></script>
 </body></html>
