@@ -131,3 +131,8 @@
 .raphael-stage.is-dragging{transition:none!important}
 .raphael-stage.is-dragging .raphael-avatar{cursor:grabbing;filter:drop-shadow(0 18px 29px rgba(14,36,64,.3))}
 @media(max-width:850px){.raphael-avatar{cursor:pointer}}
+
+/* Optional AI connectivity / honest offline fallback */
+.raphael-send:disabled{opacity:.58;cursor:wait}
+.raphael-source-note{font-size:10px;color:#7a879a;line-height:1.5;padding-left:3px}
+#raphael-ai-status{display:block;line-height:1.5}
