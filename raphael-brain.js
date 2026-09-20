@@ -116,7 +116,7 @@
       response=this.nowAnswer(false,nav);
     } else if (has(q,['his previous jobs','previous employers','career','experience','where did he work','work before','worked before','past job','companies','ক্যারিয়ার','চাকরি','কোথায় কাজ','কোথায় কাজ','অভিজ্ঞতা'])) {
       response=this.careerAnswer(has(q,['before','previous','past','আগে']),nav);
-    } else if (has(q,['education','degree','university','diploma','study','studied','training','certifications','certificates','qualification','শিক্ষা','বিশ্ববিদ্যালয়','ডিপ্লোমা','সার্টিফিকেট','প্রশিক্ষণ'])) {
+    } else if (has(q,['education','degree','university','diploma','what did he study','studies','studied','training','certifications','certificates','qualification','শিক্ষা','বিশ্ববিদ্যালয়','ডিপ্লোমা','সার্টিফিকেট','প্রশিক্ষণ'])) {
       response=this.educationAnswer(nav,has(q,['training','certifications','certificates','সার্টিফিকেট','প্রশিক্ষণ']));
     } else if (has(q,['skills','strengths','capabilities','what does he do','what does jahid do','what does rakib do','what do you do','expertise','দক্ষতা','কী পারেন','কি পারেন'])) {
       response=make(t("He works across marketing intelligence, research and data analysis; social media and campaigns; graphic design and packaging; creative direction, events and SketchUp layouts; and digital systems. His focus is Data × Digital × Design.",
