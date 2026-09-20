@@ -18,6 +18,36 @@
 @media(max-width:650px){.lightbox{padding:70px 12px 64px}.lightbox-stage{width:100%;height:78vh}.lightbox-close{top:14px;right:14px;width:40px;height:40px}.lightbox-nav{top:auto;bottom:12px;width:48px;height:48px;border-radius:50%;transform:none}.lightbox-nav:hover{transform:scale(1.04)}.lightbox-prev{left:18px}.lightbox-next{right:18px}.lightbox-meta{bottom:16px;padding:8px 12px}.lightbox-hint{display:none}}
 @media(max-width:520px){.case-metric{padding:22px}.case-metric-list{grid-template-columns:1fr 1fr;gap:8px}.case-metric-list li{padding:11px;min-height:82px;font-size:9.5px}.case-metric-list strong{font-size:22px}.case-metric>strong{font-size:38px}.case-metric-lead{font-size:11px}}
 
+/* Video-first 3D work; existing case-study palette and type system retained. */
+.case-visuals.modeling-projects{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;min-height:0!important;gap:22px}
+.modeling-project{min-width:0;min-height:0;padding:clamp(22px,3.2vw,38px);border:1px solid var(--line);box-shadow:0 16px 42px rgba(16,33,58,.045)}
+.modeling-project:first-child{border-top:3px solid var(--signal-a)}
+.modeling-project>small{display:inline-block;margin-bottom:6px}
+.modeling-project>h2{font-size:clamp(27px,3vw,40px);line-height:1.12;margin:9px 0 10px;letter-spacing:-.04em}
+.modeling-description{font-size:14px;line-height:1.7;max-width:850px;color:var(--muted)}
+.modeling-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}
+.modeling-facts>div{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:18px;min-width:0}
+.modeling-facts h3{font-size:10px;letter-spacing:.11em;color:var(--signal-a);font-weight:800;margin:0 0 9px}
+.modeling-facts p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+.modeling-video{position:relative;width:100%;min-width:0;min-height:210px;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#17273e;border:1px solid rgba(16,33,58,.18)}
+.modeling-video-fallback{position:relative;z-index:1;padding:42px 22px;display:flex;min-height:210px;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center;color:#e7edf6}
+.modeling-video-fallback span{color:#ffbf96;font-weight:800;font-size:10px;letter-spacing:.15em}
+.modeling-video-fallback strong{font-size:clamp(20px,3vw,29px);line-height:1.2;letter-spacing:-.03em}
+.modeling-video-fallback small{font-size:11px;color:#b8c5d5}
+.modeling-video video{display:none;width:100%;height:auto;max-width:100%;max-height:min(70vh,650px);object-fit:contain;background:#17273e}
+.modeling-video.is-ready{min-height:0}
+.modeling-video.is-ready video{display:block}
+.modeling-video.is-ready .modeling-video-fallback{display:none}
+.modeling-controls{position:absolute;z-index:3;bottom:14px;right:14px;display:none;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.modeling-video.is-ready .modeling-controls{display:flex}
+.modeling-control,.modeling-play-overlay{font:inherit;border:1px solid rgba(255,255,255,.22);background:rgba(13,26,45,.84);color:#fff;border-radius:999px;padding:10px 14px;font-size:11px;font-weight:750;line-height:1.2;cursor:pointer;backdrop-filter:blur(10px);transition:background .2s}
+.modeling-control:hover,.modeling-play-overlay:hover{background:rgba(30,48,71,.98)}
+.modeling-control:focus-visible,.modeling-play-overlay:focus-visible{outline:3px solid #ffb21d;outline-offset:3px}
+.modeling-play-overlay{display:none;position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);padding:14px 20px}
+.modeling-project.needs-play .modeling-video.is-ready .modeling-play-overlay{display:block}
+@media(max-width:850px){.modeling-facts{grid-template-columns:1fr}.modeling-project{padding:21px}.modeling-video{min-height:190px}.modeling-video video{max-height:65svh}.modeling-controls{bottom:10px;right:10px}.modeling-control{padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.modeling-control,.modeling-play-overlay{transition:none}}
+
 /* Creative direction photos: fit different image proportions without cropping or changing the shared collage. */
 .creative-gallery .case-visual{background:#f7f8fa}
 .creative-gallery .case-visual img{object-fit:contain;object-position:center;background:#f7f8fa;transform:none}
