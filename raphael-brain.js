@@ -34,11 +34,45 @@
     text, topic:topic||'general', route:route||null, mood:mood||'talking', suggestions:suggestions||[]
   });
 
+  // Public site corpus is generated from the actual Work/CV/Certifications pages at build time.
+  const corpus = Array.isArray(window.RAPHAEL_CORPUS?.entries) ? window.RAPHAEL_CORPUS.entries : [];
+  const stop = new Set(['a','an','and','are','at','be','by','can','could','did','do','does','for','from','has','have','he','her','him','his','how','i','in','is','it','jahid','me','more','my','of','on','or','please','raphael','she','show','tell','than','that','the','their','there','these','they','this','to','us','was','what','when','where','which','who','why','with','would','you','your','about','some','his','portfolio','আমাকে','তার','তিনি','জাহিদ','কোথায়','কোথায়','কোন','কি','কী','এর','ওই','এটা','এইটা','বলো','দেখাও','সম্পর্কে','আরও']);
+  const words = input => (norm(input).match(/[\p{L}\p{N}]+/gu)||[]).filter(w => w.length>1 && !stop.has(w));
+  const unique = terms => [...new Set(terms)];
+  function relevantEntries(query, context) {
+    const terms=unique(words(query));
+    if(!terms.length)return [];
+    const phrase=norm(query).replace(/[?!.,]/g,'').trim();
+    const scored=[];
+    for(const entry of corpus) {
+      const title=norm(entry.title), body=norm(entry.text), tags=norm((entry.tags||[]).join(' '));
+      let score=0, matched=0;
+      for(const word of terms) {
+        if(title.includes(word)){score+=7;matched++;}
+        else if(tags.includes(word)){score+=4;matched++;}
+        else if(body.includes(word)){score+=1.7;matched++;}
+      }
+      if(phrase.length>5&&title.includes(phrase)){score+=18;matched++;}
+      if(context?.project&&entry.key===context.project)score+=.5;
+      if(score>=4&&matched>=1)scored.push({entry,score,matched});
+    }
+    return scored.sort((a,b)=>b.score-a.score).slice(0,5);
+  }
+  function shorten(value,max=650) {
+    const str=String(value||'').trim();
+    if(str.length<=max)return str;
+    const cut=str.slice(0,max);
+    const last=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('। '),cut.lastIndexOf('; '));
+    return cut.slice(0,last>max*.55?last+1:max).trim()+(last>max*.55?'':'…');
+  }
+
+
   function Brain() {
     this.lang = bn ? 'bn-BD' : 'en-US';
     this.topic = null;
     this.lastRoute = null;
     this.history = []; // RAM only; user text is never persisted.
+    this.lastEntry = null;
     this.section = 'hero';
     this.project = null;
     try {
@@ -66,12 +100,19 @@
     const input = String(raw||'').slice(0,500).trim();
     const q = norm(input);
     const context = this.context(ctx);
+    const candidates = relevantEntries(q,context);
     const nav = has(q,navWords);
     const lookingAt = workByKey(context.project);
     const last = workByKey(this.topic);
     const current = last || lookingAt;
     let response;
     if (!q) return make(shortList, 'general');
+
+    // Credentials are a real, public destination, not an unknown keyword or a generic education answer.
+    if (has(q,['certificate','certificates','certification','certifications','credential','credentials','where is his certificate','সার্টিফিকেট','সনদ','প্রমাণপত্র','প্রশিক্ষণের সনদ'])) {
+      return this.remember(input,this.credentialsAnswer(q));
+    }
+
     const clarify = text => make(text,'general',null,'thinking',['Show his work','What is he building?']);
     const workMatch = (() => {
       const scores = K.work.map(work => {
@@ -101,7 +142,8 @@
       else response=make(t("You're in the " + (context.section||'portfolio') + " area. "+shortList,
                             "তুমি এখন পোর্টফোলিওর "+(context.section||'এই')+" অংশে আছো। "+shortList),'general',null,'observing');
     } else if (has(q,['tell me more','more about it','go on','explain it','elaborate','আরো বলো','আরও বলো','বিস্তারিত','আরো জানতে চাই'])) {
-      if (this.topic==='now'||context.section==='now'&&!this.topic) response=this.nowAnswer(true);
+      if (this.lastEntry && this.topic===this.lastEntry.key) response=this.entryAnswer(this.lastEntry,true);
+      else if (this.topic==='now'||context.section==='now'&&!this.topic) response=this.nowAnswer(true);
       else if (current)response=this.workAnswer(current,true,context);
       else if (this.topic==='experience')response=this.careerAnswer(true);
       else if (this.topic==='education'||this.topic==='certifications')response=this.educationAnswer();
@@ -123,6 +165,8 @@
                         "তাঁর কাজে আছে মার্কেটিং ইন্টেলিজেন্স, গবেষণা ও ডেটা অ্যানালাইসিস; সোশ্যাল মিডিয়া ও ক্যাম্পেইন; গ্রাফিক ও প্যাকেজিং ডিজাইন; ক্রিয়েটিভ ডিরেকশন, ইভেন্ট ও SketchUp লেআউট; এবং ডিজিটাল সিস্টেম। মূল ফোকাস Data × Digital × Design।"),'work',nav?routeFor('work'):null,'helping',['Show his work','What is he building?']);
     } else if (has(q,['contact','email','linkedin','hire','reach him','message him','github','cv','resume','সিভি','যোগাযোগ','ইমেইল','মেইল','লিংকডইন'])) {
       response=this.contactAnswer(q,nav);
+    } else if (candidates[0] && candidates[0].score>=12 && ['case','project'].includes(candidates[0].entry.type)) {
+      response=this.entryAnswer(candidates[0].entry,false);
     } else if (workMatch) {
       response=this.workAnswer(workMatch,has(q,['explain','details','more','what did','how','result','purpose','বিস্তারিত','কিভাবে','কী করেছেন'])||lookingAt?.key===workMatch.key,context,nav);
     } else if (has(q,['who is jahid','who is your master','who is he','tell me about jahid','current role','job title','which company','who is rakib','জাহিদ কে','রাকিব কে','বস কে','কোথায় কাজ করেন','কোথায় কাজ করেন'])) {
@@ -135,9 +179,31 @@
       } else if (destination==='now') response=this.nowAnswer(false);
       else if (destination==='experience') response=this.careerAnswer(false);
       else if (destination==='work') response=make(t("His Work section has ten categories, from SketchUp layouts and design to digital marketing, analytics, technology and events. Pick one and I'll unpack it.", "Work অংশে SketchUp, ডিজাইন, ডিজিটাল মার্কেটিং, অ্যানালাইসিস, টেকনোলজি, ইভেন্টসহ দশটি ক্যাটাগরি আছে। যেটা পছন্দ, বলো।"),'work',nav?routeFor('work'):null,'observing',['Show his work','Show his AI work']);
+      else if (candidates[0] && candidates[0].score>=6) response=this.entryAnswer(candidates[0].entry,false);
       else response=clarify(t("Hmm, I don't have a verified answer for that in Jahid's public portfolio. Ask about one of his projects, career, skills or current build — I can take you there.", "হুম, জাহিদের প্রকাশিত পোর্টফোলিওতে এর যাচাইকৃত উত্তর নেই। তাঁর প্রজেক্ট, ক্যারিয়ার, দক্ষতা বা বর্তমান কাজের বিষয়ে জানতে পারো।"));
     }
     return this.remember(input,response);
+  };
+  Brain.prototype.credentialsAnswer=function(q) {
+    const items=corpus.filter(e=>e.type==='certificate');
+    const listing=items.length?items.map(e=>e.title+' — '+(e.text.split(' · ')[1]||'see credential')).join('; '):
+      K.education.concat(K.training).join('; ');
+    const answer=t("Absolutely — his certificates have their own page. You'll find "+items.length+" published entries: "+listing+". Open the Certificates & Training section for the full details.",
+                   "অবশ্যই — তাঁর সার্টিফিকেটের জন্য আলাদা পেজ আছে। প্রকাশিত "+items.length+"টি এন্ট্রি: "+listing+"। বিস্তারিত দেখতে সার্টিফিকেশন পেজ খুলে দেখো।");
+    return make(answer,'certifications',routeFor('certifications'),'pointing',
+      ['Open certifications','Which certificates?','View his CV']);
+  };
+  Brain.prototype.entryAnswer=function(entry,more){
+    if(!entry)return make(shortList,'general');
+    this.lastEntry=entry;
+    const intro=t('I found this in Jahid’s published portfolio: ','জাহিদের প্রকাশিত পোর্টফোলিওতে পেয়েছি: ');
+    const prefix=entry.title+'. ';
+    const detail=shorten(entry.text,more?1050:620);
+    return make(intro+prefix+detail,entry.key,entry.href,'helping',
+      ['Open this case study','Tell me more','What is he building?']);
+  };
+  Brain.prototype.findInPortfolio=function(question,ctx) {
+    return relevantEntries(question,ctx||{}).map(x=>({title:x.entry.title,href:x.entry.href,excerpt:shorten(x.entry.text,240),score:x.score}));
   };
   Brain.prototype.workAnswer = function (work, detail, ctx, nav) {
     let content = work.summary + (detail?' '+work.details:'');
