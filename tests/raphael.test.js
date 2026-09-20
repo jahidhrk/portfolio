@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
 function read(path){return fs.readFileSync(path,'utf8');}
-for(const path of ['script.js','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js','scripts/build-raphael-corpus.js']){
+for(const path of ['script.js','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael-ai-config.js','raphael.js','scripts/build-raphael-corpus.js']){
   new vm.Script(read(path),{filename:path});
 }
 for(const page of ['index.html','work.html','certifications.html','cv.html']){
   const html=read(page);
-  for(const file of ['raphael.css','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js']){
+  for(const file of ['raphael.css','raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael-ai-config.js','raphael.js']){
     assert(html.includes(file),page+' missing Raphael asset: '+file);
   }
 }
@@ -59,9 +59,11 @@ for(const [input,topic,route] of cases){
   assert(result.text&&typeof result.text==='string');
 }
 assert(read('raphael.js').includes('raphael-voice-select'),'Voice selector is missing');
+assert(read('raphael.js').includes('aiEndpoint'),'Optional secure AI client must be wired');
+assert(read('workers/raphael-ai.js').includes('env.GEMINI_API_KEY'),'Worker should keep model secret server-side');
 assert(read('raphael.js').includes('is-dragging'),'Raphael drag motion is missing');
 assert(read('raphael.css').includes('raphael-voice-settings'),'Voice UI style is missing');
 assert(!/sk-[A-Za-z0-9]{20,}/.test(
-  ['raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael.js'].map(read).join('')),
+  ['raphael-knowledge.js','raphael-corpus.js','raphael-brain.js','raphael-ai-config.js','raphael.js'].map(read).join('')),
   'Potential API key in client script');
 console.log('Raphael: script syntax, page integration, Work archive, 19 conversation scenarios and key check passed.');
