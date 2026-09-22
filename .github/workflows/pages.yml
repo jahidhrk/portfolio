@@ -29,6 +29,8 @@ jobs:
         run: node tests/raphael.test.js
       - name: Test optional secure Raphael AI Worker
         run: node tests/raphael-ai.test.js
+      - name: Validate portfolio SEO
+        run: node tests/seo.test.js
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
